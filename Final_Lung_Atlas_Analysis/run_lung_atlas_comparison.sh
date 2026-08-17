@@ -58,8 +58,8 @@ PROJECT_ROOT=/home/nandy.15/Research/Transfer_clustering
 cd "$PROJECT_ROOT/Final_Lung_Atlas_Analysis"
 
 # --- array math: the array index IS the task_id directly -- run_lung_atlas_
-# comparison.py itself maps it to a (target_batch, method) pair via
-# itertools.product(common.BATCHES, common.METHOD_LABELS.keys()).
+# comparison.py itself maps it to a (target_batch, method, source) triple
+# via its own task_grid().
 task_id=$SLURM_ARRAY_TASK_ID
 
 echo "Running task_id=$task_id"

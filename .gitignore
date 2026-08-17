@@ -23,6 +23,11 @@ __pycache__/
 Final_Lung_Atlas_Analysis/results/
 Final_Lung_Atlas_Analysis/results_0.5_alpha/
 
+# Timestamped backups of results dirs, taken before a clear-and-resubmit
+# (e.g. results_0.5_alpha_pre_expansion_backup_2026-08-17/) -- never meant
+# for the repo, same as the results dirs they're backing up.
+*_backup_*/
+
 # Raw data (large binaries; obtain separately)
 *.h5ad
 *.npy
@@ -43,3 +48,7 @@ Final_Lung_Atlas_Analysis/results_0.5_alpha/
 *.pdf
 session_notes_*.md
 deploy_key.txt
+
+# One-off local diagnostic script, not part of the curated package/analysis
+# (compares a live run's raw CSVs against the pre-expansion backup above).
+Final_Lung_Atlas_Analysis/verify_against_table1.py
