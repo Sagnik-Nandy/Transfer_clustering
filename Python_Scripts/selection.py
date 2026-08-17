@@ -8,7 +8,7 @@ that the paper never pins down numerically. `two_community.AdaptiveTransferClust
 and `multi_cluster.AdaptiveProjectedClustering` expose three selection
 strategies (no cross-validation / sample-splitting in any of them):
 
-  - "formula": the literal threshold with a user-specified C0/D0.
+  - "formula": the literal threshold with a caller-specified C0/D0.
   - "bootstrap": `bootstrap_null_quantile` below -- a parametric bootstrap
     that simulates synthetic replicates at the condition-(8)-style
     recovery threshold (not at zero signal -- see
@@ -18,10 +18,6 @@ strategies (no cross-validation / sample-splitting in any of them):
     resulting distribution as the threshold.
   - "manual": the caller directly names which branch (target/source) to
     use, bypassing all statistics.
-
-(An earlier silhouette-based strategy was tried and removed: scoring each
-candidate on its own self-derived discriminating direction turned out to
-be circular -- see DISCUSSION_NOTES.md.)
 """
 from __future__ import annotations
 

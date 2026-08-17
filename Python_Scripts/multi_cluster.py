@@ -267,8 +267,7 @@ def target_source_pooled_subspace_estimate(
     `two_community.target_source_pooled_subspace_estimate`: like
     `_source_branch`, but the target's own estimated mean matrix is pooled
     into the projection subspace alongside the sources', rather than being
-    reserved for a separate target-only branch. Not part of the discussion
-    draft; a user-specified extension of eq. (45)-(46).
+    reserved for a separate target-only branch.
 
         1. estimate Theta_hat_T (d, K) from X_T itself, using the same
            regime-dependent construction as `estimate_source_means`
@@ -290,11 +289,6 @@ def target_source_pooled_subspace_estimate(
     mean subspace and re-clustering that projection with TSClust (not
     `_target_branch`, which runs relaxed K-means directly on X_T).
     """
-    # Thread random_state into relaxed_kmeans_kwargs (not just ts_clust below)
-    # so the RelaxedKMeans calls inside estimate_source_means -- hit for the
-    # target and every source whenever n < d, as in the lung atlas's
-    # n up to ~3183 vs d=5000 -- are reproducible too, matching
-    # AdaptiveProjectedClustering.fit_predict's rk_kwargs handling.
     rk_kwargs = dict(relaxed_kmeans_kwargs or {})
     rk_kwargs.setdefault("random_state", random_state)
     n_T = X_T.shape[0]
@@ -350,7 +344,7 @@ class AdaptiveProjectedClustering:
         Number of clusters (K > 2; use `two_community` for K = 2).
     selection : {"formula", "bootstrap", "manual"}
         - "formula": the literal eq. (49) threshold with a
-          user-specified constant `D0`. The paper does not specify a
+          caller-specified constant `D0`. The paper does not specify a
           numeric value for D0; this lets you set it directly.
         - "bootstrap" (default): calibrate D0 via
           `calibrate_D0_bootstrap_mult` (boundary-calibrated, not
@@ -378,7 +372,7 @@ class AdaptiveProjectedClustering:
 
     After `fit_predict`, `D0_used_` holds the D0 that was actually plugged
     into `validation_threshold_mult` (the calibrated `D0_hat` under
-    "bootstrap", or the user-supplied `D0` under "formula"; `None` under
+    "bootstrap", or the caller-supplied `D0` under "formula"; `None` under
     "manual").
 
     No cross-validation / sample-splitting is used anywhere in this class.
@@ -403,14 +397,9 @@ class AdaptiveProjectedClustering:
 
         # Thread random_state into every RelaxedKMeans/ts_clust call below
         # (via a local copy of relaxed_kmeans_kwargs, so the caller's dict
-        # isn't mutated). Previously only calibrate_D0_bootstrap_mult's own
-        # bootstrap draws respected self.random_state -- _target_branch/
-        # _source_branch's underlying K-means rounding step silently fell
-        # back to sklearn's unseeded default (random_state=None), making
-        # every RelaxedKMeans-based result non-reproducible across separate
-        # calls/processes, and preventing an adaptively-chosen branch from
-        # exactly matching a separately-run target-only/source-only call
-        # even on identical data.
+        # isn't mutated), so results are reproducible and an
+        # adaptively-chosen branch exactly matches a separately-run
+        # target-only/source-only call on identical data.
         rk_kwargs = dict(self.relaxed_kmeans_kwargs)
         rk_kwargs.setdefault("random_state", self.random_state)
 

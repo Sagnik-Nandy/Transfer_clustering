@@ -64,9 +64,9 @@ assert set(ALL_METHODS) == set(common.METHOD_LABELS), "ALL_METHODS must match co
 
 # The 4 "ours" methods that take a `sources` list and pool/project across it
 # -- these are the ones that additionally get a one-source-at-a-time run,
-# on top of their original all-sources-pooled run. target_only takes no
-# sources at all; the comparators (tlgmm/scrna/gdec_gcnfree) keep their
-# original all-sources-only behavior (not requested to be split out).
+# on top of their all-sources-pooled run. target_only takes no sources at
+# all; the comparators (tlgmm/scrna/gdec_gcnfree) keep their
+# all-sources-only behavior.
 MULTI_SOURCE_METHODS = {
     "multi_source_pooled", "pooled_concat", "target_source_pooled", "adaptive_multi_source",
 }

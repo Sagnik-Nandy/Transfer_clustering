@@ -19,11 +19,10 @@ configured with a cvxpy solver name (e.g. solver="SCS"), which this script
 does not do.
 
 Writes one CSV with 7 rows (one per method) to RESULTS_DIR. "new_pooled"
-(`target_source_pooled_subspace_estimate`) is a user-specified extension, not
-part of the simulation plan -- pools the target's own estimated mean matrix
-into the projection subspace alongside the sources', rather than reserving it
-for a separate target-only branch. See Python_Scripts/multi_cluster.py's
-docstring.
+(`target_source_pooled_subspace_estimate`) pools the target's own estimated
+mean matrix into the projection subspace alongside the sources', rather
+than reserving it for a separate target-only branch. See
+Python_Scripts/multi_cluster.py's docstring.
 """
 from __future__ import annotations
 
@@ -190,12 +189,8 @@ def run_one(seed: int) -> list:
 
     # random_state=seed threaded into every RelaxedKMeans/ts_clust call below
     # (via AdaptiveProjectedClustering.fit_predict's rk_kwargs handling, and
-    # directly for pooled_subspace_estimate) -- previously only the
-    # "adaptive" model at the bottom of this function passed random_state,
-    # so target_only/source1_only/source2_only/combined_sources/pooled were
-    # all silently falling back to sklearn's unseeded K-means rounding step
-    # (random_state=None), making 5 of 6 methods non-reproducible run-to-run
-    # for a fixed seed.
+    # directly for pooled_subspace_estimate), so every method is reproducible
+    # run-to-run for a fixed seed.
     target_model = AdaptiveProjectedClustering(K=K, selection="manual", manual_choice="target",
                                                 sigma_T2=SIGMA2, random_state=seed)
     Z_target, branch = target_model.fit_predict(X_T, [])

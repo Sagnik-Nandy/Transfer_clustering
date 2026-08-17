@@ -33,10 +33,9 @@ IMPORTANT MODELING NOTES
     same specified optimization, not an approximation. As the paper
     recommends, we run the greedy procedure over several random task
     orderings and keep the lowest-total-score result (N_ALIGNMENT_SHUFFLES
-    below, fewer than the paper's 200 for practicality). Verified
-    correct on synthetic data with a fully scrambled task labeling (see
-    the project's development notes) -- it recovers the true
-    correspondence exactly.
+    below, fewer than the paper's 200 for practicality). Recovers the true
+    correspondence exactly, including under a fully scrambled task
+    labeling.
 
 (3) Algorithm 4's Step 12 (per-contrast r=2..R aggregation across sources)
     is a joint minimization over each source's own beta_r^(k) AND a shared

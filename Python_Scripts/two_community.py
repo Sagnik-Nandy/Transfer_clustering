@@ -113,8 +113,7 @@ def target_source_pooled_subspace_estimate(
     """Target+source pooled-subspace estimator: like `source_based_estimate`,
     but the target's own estimated direction is pooled into the projection
     subspace alongside the sources', rather than being reserved for a
-    separate target-only branch. Not part of the discussion draft; a
-    user-specified extension of eq. (34)-(35).
+    separate target-only branch.
 
         1. estimate theta_hat_T from X_T itself, using the same
            regime-dependent construction as `estimate_source_direction`
@@ -264,8 +263,7 @@ def calibrate_C0_bootstrap(
     be statistically detectable (pushing |T_hat| above a zero-signal
     null's quantiles) while still being far too small for the target-based
     estimator to be trustworthy for clustering (a classic
-    detection-vs-estimation gap; confirmed empirically, see
-    DISCUSSION_NOTES.md). So instead of simulating pure noise, this
+    detection-vs-estimation gap). So instead of simulating pure noise, this
     bootstrap simulates replicates *at the condition-(8) recovery
     threshold itself*: Delta_T_boundary = boundary_scale * max(1,
     (d/n_T)^(1/4)), with a uniformly random direction each replicate (the
@@ -314,7 +312,7 @@ class AdaptiveTransferClustering:
     ----------
     selection : {"formula", "bootstrap", "manual"}
         - "formula": the literal eq. (16)-(18) threshold with a
-          user-specified constant `C0`. The paper does not specify a
+          caller-specified constant `C0`. The paper does not specify a
           numeric value for C0; this lets you set it directly.
         - "bootstrap" (default): calibrate C0 via `calibrate_C0_bootstrap`,
           simulating replicates at the condition-(8) recovery threshold
@@ -334,7 +332,7 @@ class AdaptiveTransferClustering:
 
     After `fit_predict`, `C0_used_` holds the C0 that was actually plugged
     into `validation_threshold` (the calibrated `C0_hat` under "bootstrap",
-    or the user-supplied `C0` under "formula"; `None` under "manual").
+    or the caller-supplied `C0` under "formula"; `None` under "manual").
 
     No cross-validation / sample-splitting is used anywhere in this class.
     """

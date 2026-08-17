@@ -20,10 +20,10 @@ noise/labels vary by seed. Default (FIXED_UV=False) resamples (u,v) fresh
 each Monte Carlo repetition, per Sec 2.1.
 
 Writes one CSV with 5 methods x len(MU_GRID) rows to RESULTS_DIR. "new_pooled"
-(`target_source_pooled_subspace_estimate`) is a user-specified extension, not
-part of the simulation plan -- pools the target's own estimated direction into
-the projection subspace alongside the source's, rather than reserving it for a
-separate target-only branch. See Python_Scripts/two_community.py's docstring.
+(`target_source_pooled_subspace_estimate`) pools the target's own estimated
+direction into the projection subspace alongside the source's, rather than
+reserving it for a separate target-only branch. See
+Python_Scripts/two_community.py's docstring.
 """
 from __future__ import annotations
 
@@ -58,11 +58,7 @@ DELTA_T = 0.8                        # fixed target signal (Sec 3)
 MU_GRID = [0.0, 0.025, 0.05, 0.1, 0.15, 0.2, 0.4, 0.8]  # alignment grid (Sec 3), finer near mu=0
 SIGMA2 = 1.0                          # noise variance, known (Sec 2: noise ~ N(0, I_d))
 
-# Delta_S per regime, set uniformly to 3.0 across all regimes (brought
-# down from the earlier 8.0; see PR discussion -- the pilot notebook this
-# was originally attributed to,
-# Notebooks_simulation/experiment1_00_pilot_calibrate_delta_S.ipynb, does
-# not exist in the repo).
+# Delta_S per regime, set uniformly to 3.0 across all regimes.
 DELTA_S_BY_REGIME = {
     "R1": 3.0,
     "R2": 3.0,

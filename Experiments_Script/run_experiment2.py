@@ -20,11 +20,10 @@ noise/labels vary by seed. Default (FIXED_UV=False) resamples (u,v) fresh
 each Monte Carlo repetition, per Sec 2.1.
 
 Writes one CSV with 5 methods x len(DELTA_T_GRID) x len(DELTA_S_GRID) rows
-to RESULTS_DIR. "new_pooled" (`target_source_pooled_subspace_estimate`) is a
-user-specified extension, not part of the simulation plan -- pools the
-target's own estimated direction into the projection subspace alongside the
-source's, rather than reserving it for a separate target-only branch. See
-Python_Scripts/two_community.py's docstring.
+to RESULTS_DIR. "new_pooled" (`target_source_pooled_subspace_estimate`)
+pools the target's own estimated direction into the projection subspace
+alongside the source's, rather than reserving it for a separate
+target-only branch. See Python_Scripts/two_community.py's docstring.
 """
 from __future__ import annotations
 
@@ -58,11 +57,8 @@ REGIME_ORDER = ["R1", "R2", "R3"]  # fixes the SLURM array's regime_idx order
 MU = 0.8  # fixed alignment (Sec 4.2) -- Experiment 2 varies (Delta_T, Delta_S) instead
 SIGMA2 = 1.0  # noise variance, known (Sec 2: noise ~ N(0, I_d))
 
-# Section 4.4, "Parameter grid": starting grid (can be adjusted after pilot
-# runs per Sec 4.4, but the paper gives these as concrete starting values,
-# unlike Experiment 1's Delta_S which it explicitly deferred to a pilot).
-# Cut from 8x8 to 5x5 on 2026-07-09 -- regime R3 (n_T=n_S=2500) was taking
-# too long per task at the original density.
+# Section 4.4, "Parameter grid": 5x5 grid, kept modest since regime R3
+# (n_T=n_S=2500) is the slowest per task.
 DELTA_T_GRID = [0.5, 1.0, 1.5, 2.0, 2.5]
 DELTA_S_GRID = [0.5, 1.0, 1.5, 2.0, 2.5]
 

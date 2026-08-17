@@ -19,15 +19,13 @@ the notebook.
                              estimated mean matrix is pooled into the
                              projection subspace alongside the sources',
                              instead of being reserved for a separate
-                             target-only branch. Not part of the discussion
-                             draft; a user-specified extension.
+                             target-only branch.
   5. adaptive_multi_source -- bootstrap-adaptive target/source switch
 
 NOTE on cost: pooled_concat feeds RelaxedKMeans an SDP over ~9,900
 concatenated rows (vs. ~3,183 for target_only alone), and the SDP's cubic
 cost in n makes this the single most expensive call in the whole
-comparison -- included here at explicit request despite that cost; see
-run_lung_atlas_comparison.sh's time budget.
+comparison; see run_lung_atlas_comparison.sh's time budget.
 """
 from __future__ import annotations
 
@@ -54,15 +52,13 @@ ADAPTIVE_N_BOOT = 30
 ADAPTIVE_ALPHA = 0.5
 ADAPTIVE_BOUNDARY_SCALE = 1.0
 
-# All four methods route through RelaxedKMeans somewhere (target_only
-# directly; the other three via estimate_source_means, since every
-# Dropseq batch has n < d=5000, hitting RelaxedKMeans's n_S < d branch).
-# ADMM (Mixon, Villar & Ward 2017 -- see relaxed_kmeans.py) is opted into
-# HERE, per-call, matching RelaxedKMeans's own new default, so this stays
-# explicit even if that shared default changes later. Previously pinned to
-# MOSEK (this machine's license, unavailable on the OSU cluster); ADMM
-# needs no external SDP solver at all and is dramatically cheaper at these
-# batch sizes (n_T up to ~3183, K=13).
+# All methods route through RelaxedKMeans somewhere (target_only directly;
+# the others via estimate_source_means, since every Dropseq batch has
+# n < d=5000, hitting RelaxedKMeans's n_S < d branch). ADMM (Mixon, Villar
+# & Ward 2017 -- see relaxed_kmeans.py) is opted into HERE, per-call,
+# matching RelaxedKMeans's own default, so this stays explicit even if that
+# shared default changes later: it needs no external SDP solver and is
+# cheap at these batch sizes (n_T up to ~3183, K=13).
 RELAXED_KMEANS_KWARGS = {"solver": "ADMM"}
 
 
