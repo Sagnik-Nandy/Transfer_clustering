@@ -107,6 +107,50 @@ def source_based_estimate(X_T: np.ndarray, source_datasets: Sequence[np.ndarray]
     return labels
 
 
+def target_source_pooled_subspace_estimate(
+    X_T: np.ndarray, source_datasets: Sequence[np.ndarray]
+) -> np.ndarray:
+    """Target+source pooled-subspace estimator: like `source_based_estimate`,
+    but the target's own estimated direction is pooled into the projection
+    subspace alongside the sources', rather than being reserved for a
+    separate target-only branch. Not part of the discussion draft; a
+    user-specified extension of eq. (34)-(35).
+
+        1. estimate theta_hat_T from X_T itself, using the same
+           regime-dependent construction as `estimate_source_direction`
+           (spectral-clustering-then-average if d > n_T, leading right
+           singular vector otherwise) -- i.e. treat the target exactly like
+           one more "source" for the purpose of direction estimation only,
+        2. estimate theta_hat_S_i from each source dataset the same way,
+        3. pool ALL m+1 directions {theta_hat_T, theta_hat_S_1, ...,
+           theta_hat_S_m} into one joint subspace Q (orthonormal basis of
+           their span, via `source_subspace_basis`),
+        4. project the target observations onto Q: X_hat_T = X_T @ Q,
+        5. cluster X_hat_T by the sign of the leading eigenvector of its
+           Gram matrix, exactly as in `source_based_estimate`.
+
+    Unlike `AdaptiveTransferClustering`, there is no hard target-vs-source
+    switch and no validation statistic/threshold -- the target's direction
+    is simply one more column pooled into the shared subspace before
+    projecting and re-clustering the target data through it. With no
+    source datasets, this reduces to projecting X_T onto its own estimated
+    direction, i.e. `source_based_estimate(X_T, [X_T])`'s single-direction
+    special case (not `target_based_estimate`, which clusters directly on
+    the hollowed Gram matrix rather than a 1-D projection).
+    """
+    theta_hat_T = estimate_source_direction(X_T)
+    directions = [theta_hat_T] + [estimate_source_direction(X_S) for X_S in source_datasets]
+    Q = source_subspace_basis(directions)
+
+    X_hat_T = X_T @ Q
+    v_hat = _leading_eigvec_direction(X_hat_T)
+
+    scores = X_hat_T @ v_hat
+    labels = np.sign(scores)
+    labels[labels == 0] = 1.0
+    return labels
+
+
 def pooled_subspace_estimate(X_T: np.ndarray, source_datasets: Sequence[np.ndarray]) -> np.ndarray:
     """Pooled estimator: an alternative to `AdaptiveTransferClustering`'s
     hard target/source switch. Instead of using the validation statistic to

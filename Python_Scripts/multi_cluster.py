@@ -256,6 +256,60 @@ def _source_branch(
     return labels_to_onehot(labels_S, K), X_hat_T
 
 
+def target_source_pooled_subspace_estimate(
+    X_T: np.ndarray,
+    K: int,
+    source_datasets: Sequence[np.ndarray],
+    relaxed_kmeans_kwargs: Optional[Dict] = None,
+    random_state: Optional[int] = None,
+) -> np.ndarray:
+    """Target+source pooled-subspace estimator, K>2 analogue of
+    `two_community.target_source_pooled_subspace_estimate`: like
+    `_source_branch`, but the target's own estimated mean matrix is pooled
+    into the projection subspace alongside the sources', rather than being
+    reserved for a separate target-only branch. Not part of the discussion
+    draft; a user-specified extension of eq. (45)-(46).
+
+        1. estimate Theta_hat_T (d, K) from X_T itself, using the same
+           regime-dependent construction as `estimate_source_means`
+           (relaxed-K-means-then-cluster-means if n_T < d, top-K right
+           singular vectors otherwise) -- i.e. treat the target exactly
+           like one more "source" for the purpose of mean estimation only,
+        2. estimate Theta_hat_S_i from each source dataset the same way,
+        3. pool ALL m+1 mean matrices {Theta_hat_T, Theta_hat_S_1, ...,
+           Theta_hat_S_m} into one joint subspace R (orthonormal basis of
+           their combined column span, via `source_subspace_projector`),
+        4. project the target observations onto R: X_hat_T = X_T @ Q_R,
+        5. cluster X_hat_T with TSClust, exactly as in `_source_branch`.
+
+    Unlike `AdaptiveProjectedClustering`, there is no hard target-vs-source
+    switch and no validation statistic/threshold -- the target's mean
+    matrix is simply pooled into the shared subspace before projecting and
+    re-clustering the target data through it. With no source datasets,
+    this reduces to projecting X_T onto its own estimated K-dimensional
+    mean subspace and re-clustering that projection with TSClust (not
+    `_target_branch`, which runs relaxed K-means directly on X_T).
+    """
+    # Thread random_state into relaxed_kmeans_kwargs (not just ts_clust below)
+    # so the RelaxedKMeans calls inside estimate_source_means -- hit for the
+    # target and every source whenever n < d, as in the lung atlas's
+    # n up to ~3183 vs d=5000 -- are reproducible too, matching
+    # AdaptiveProjectedClustering.fit_predict's rk_kwargs handling.
+    rk_kwargs = dict(relaxed_kmeans_kwargs or {})
+    rk_kwargs.setdefault("random_state", random_state)
+    n_T = X_T.shape[0]
+    theta_hat_T = estimate_source_means(X_T, K, rk_kwargs)
+    theta_hats = [theta_hat_T] + [
+        estimate_source_means(X_S, K, rk_kwargs) for X_S in source_datasets
+    ]
+    Q_R = source_subspace_projector(theta_hats)
+
+    X_hat_T = X_T @ Q_R
+    n_iter = int(round(2 * np.log(n_T)))
+    labels = ts_clust(X_hat_T, K, n_iter=n_iter, random_state=random_state)
+    return labels_to_onehot(labels, K)
+
+
 def pooled_subspace_estimate(
     X_T: np.ndarray,
     K: int,

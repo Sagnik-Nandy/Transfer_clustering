@@ -12,8 +12,11 @@
                                           # benefits from multi-threaded BLAS -- see OMP/MKL/OPENBLAS
                                           # exports below, which must match this.
 #SBATCH --mem=16G
-#SBATCH --array=0-27                     # 4 batches x 7 methods = 28 tasks -- EDIT if common.BATCHES
-                                          # or common.METHOD_LABELS changes size.
+#SBATCH --array=0-79                     # 4 batches x 20 (target_only:1 + 4 multi-source methods x
+                                          # 4 source-specs each [all + 3 single-source] + 3 comparators:1)
+                                          # = 80 tasks -- EDIT if common.BATCHES, common.METHOD_LABELS,
+                                          # or MULTI_SOURCE_METHODS in run_lung_atlas_comparison.py changes.
+                                          # See that file's task_grid() for the exact enumeration.
 # EDIT: the two paths below must point at wherever you upload this project
 # on the cluster (mirrors Slurm_Scripts/experiment3_complementary/run_experiment3.sh).
 # SBATCH directives are parsed by slurm itself before the script body runs,

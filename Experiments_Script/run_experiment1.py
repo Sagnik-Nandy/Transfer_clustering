@@ -19,7 +19,11 @@ literally identical throughout the whole experiment, and only the
 noise/labels vary by seed. Default (FIXED_UV=False) resamples (u,v) fresh
 each Monte Carlo repetition, per Sec 2.1.
 
-Writes one CSV with 4 methods x len(MU_GRID) rows to RESULTS_DIR.
+Writes one CSV with 5 methods x len(MU_GRID) rows to RESULTS_DIR. "new_pooled"
+(`target_source_pooled_subspace_estimate`) is a user-specified extension, not
+part of the simulation plan -- pools the target's own estimated direction into
+the projection subspace alongside the source's, rather than reserving it for a
+separate target-only branch. See Python_Scripts/two_community.py's docstring.
 """
 from __future__ import annotations
 
@@ -33,7 +37,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from transfer_clustering.two_community import (
     target_based_estimate, source_based_estimate, pooled_subspace_estimate,
-    AdaptiveTransferClustering,
+    target_source_pooled_subspace_estimate, AdaptiveTransferClustering,
 )
 
 # ---------------------------------------------------------------------------
@@ -175,6 +179,9 @@ def run_one(regime: str, seed: int) -> list:
         z_hat_pooled = pooled_subspace_estimate(X_T, [X_S])
         err_pooled = misclustering_error(z_hat_pooled, z_T)
 
+        z_hat_new_pooled = target_source_pooled_subspace_estimate(X_T, [X_S])
+        err_new_pooled = misclustering_error(z_hat_new_pooled, z_T)
+
         adaptive = AdaptiveTransferClustering(
             selection="bootstrap",
             alpha=ADAPTIVE_ALPHA,
@@ -192,6 +199,8 @@ def run_one(regime: str, seed: int) -> list:
                           error=err_source, branch="", C0_used=""))
         rows.append(dict(regime=regime, seed=seed, mu=mu, method="pooled",
                           error=err_pooled, branch="", C0_used=""))
+        rows.append(dict(regime=regime, seed=seed, mu=mu, method="new_pooled",
+                          error=err_new_pooled, branch="", C0_used=""))
         rows.append(dict(regime=regime, seed=seed, mu=mu, method="adaptive",
                           error=err_adaptive, branch=branch, C0_used=adaptive.C0_used_))
 

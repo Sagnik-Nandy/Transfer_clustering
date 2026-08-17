@@ -18,7 +18,12 @@ no cvxpy needed. cvxpy is only required if RelaxedKMeans is explicitly
 configured with a cvxpy solver name (e.g. solver="SCS"), which this script
 does not do.
 
-Writes one CSV with 6 rows (one per method) to RESULTS_DIR.
+Writes one CSV with 7 rows (one per method) to RESULTS_DIR. "new_pooled"
+(`target_source_pooled_subspace_estimate`) is a user-specified extension, not
+part of the simulation plan -- pools the target's own estimated mean matrix
+into the projection subspace alongside the sources', rather than reserving it
+for a separate target-only branch. See Python_Scripts/multi_cluster.py's
+docstring.
 """
 from __future__ import annotations
 
@@ -33,6 +38,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from transfer_clustering.multi_cluster import (
     AdaptiveProjectedClustering, onehot_to_labels, pooled_subspace_estimate,
+    target_source_pooled_subspace_estimate,
 )
 
 # ---------------------------------------------------------------------------
@@ -213,6 +219,11 @@ def run_one(seed: int) -> list:
     Z_pooled = pooled_subspace_estimate(X_T, K, [X_S1, X_S2],
                                          relaxed_kmeans_kwargs={"random_state": seed})
     rows.append(eval_method("pooled", Z_pooled, branch=""))
+
+    Z_new_pooled = target_source_pooled_subspace_estimate(
+        X_T, K, [X_S1, X_S2], relaxed_kmeans_kwargs={}, random_state=seed,
+    )
+    rows.append(eval_method("new_pooled", Z_new_pooled, branch=""))
 
     adaptive_model = AdaptiveProjectedClustering(
         K=K, selection="bootstrap", alpha=ADAPTIVE_ALPHA, n_boot=ADAPTIVE_N_BOOT,

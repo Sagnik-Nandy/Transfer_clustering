@@ -24,6 +24,7 @@ METHOD_LABELS = {
     "target_only": "Target-only",
     "multi_source_pooled": "Multi-source pooled",
     "pooled_concat": "Pooled (concat)",
+    "target_source_pooled": "Target+source pooled",
     "adaptive_multi_source": "Adaptive multi-source",
     "tlgmm": "TL-GMM",
     "scrna": "NMF",

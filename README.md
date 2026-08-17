@@ -14,9 +14,21 @@ the source data is actually useful.
 
 This is a curated subset of the full research codebase, containing:
 
-- the `transfer_clustering` package implementing Algorithms 1–3,
+- the `transfer_clustering` package implementing Algorithms 1–3 (plus one
+  user-specified extension beyond the paper, see below),
 - the simulation experiments from Section 5,
 - and the Section 6 real-data analysis (human lung scRNA-seq atlas).
+
+**Beyond the paper**: `two_community.py`/`multi_cluster.py` also include
+`target_source_pooled_subspace_estimate`, referred to elsewhere as
+`new_pooled` (simulation CSVs) or "Pool+Stack" (lung atlas notebooks that
+compare it against the paper's estimator). It is **not** part of
+arXiv:2607.25031 — like `source_based_estimate`, but the target's own
+estimated direction/mean-matrix is pooled into the projection subspace
+alongside the sources', instead of being reserved for a separate
+target-only branch. It's wired in as an optional alternative everywhere the
+paper's own pooled estimator (`pooled_subspace_estimate`, "Pooled"/"Stack+Pool")
+is used, side by side, never silently replacing it.
 
 **Not included** (regenerable or out of scope for this release): raw data
 files, generated result CSVs, Slurm logs, and additional exploratory
@@ -41,20 +53,33 @@ Experiments_Script/              Slurm-array entry points for Section 5's simula
     run_experiment1.py           error vs. alignment (mu) across three (d, n_T, n_S) regimes
     run_experiment2.py           heatmaps over (Delta_T, Delta_S)
     run_experiment3.py           multi-source, K=3 complementary-information experiment
-    run_experiment4.py           comparison against TGMM / TL-GMM benchmarks
+    run_experiment4.py           comparison against TGMM / TL-GMM benchmarks (no pooled method)
 Slurm_Scripts/                   matching #SBATCH array scripts for each experiment above
-Notebooks_simulation/            aggregate-and-plot notebooks producing the paper's Sec. 5 figures
+Notebooks_simulation/            aggregate-and-plot notebooks producing the paper's Sec. 5 figures;
+                                  experiments 1-3 each have a *_new_pooled.ipynb sibling that swaps
+                                  in target_source_pooled_subspace_estimate for the "Pooled" line/
+                                  column/bar instead (see "Beyond the paper" above) -- both read the
+                                  same raw CSVs, no separate simulation run needed to switch between them
 
 Final_Lung_Atlas_Analysis/       Section 6: transfer-assisted clustering of the human lung
                                   scRNA-seq atlas (Vieira Braga et al., 2019; GSE130148),
                                   K=13 fine-grained cell types, leave-one-patient-out
     common.py                    shared config, data loading, and metrics (K, batches, scoring)
-    method_ours.py                target-only / multi-source-pooled / pooled-concat / adaptive
+    method_ours.py                target-only / multi-source-pooled / pooled-concat /
+                                   target-source-pooled / adaptive
     method_tlgmm.py               TL-GMM comparator (Tian et al., 2026)
     method_scrna.py               NMF-based comparator (Mieth et al., 2019)
     method_gdec.py                GDEC comparator (Wang et al., 2024)
-    run_lung_atlas_comparison.py  one (target batch, method) pair per Slurm array task
-    run_lung_atlas_comparison.ipynb / aggregate_and_plot*.ipynb   interactive/aggregation versions
+    run_lung_atlas_comparison.py  one (target batch, method, source) triple per Slurm array task --
+                                   the 4 methods taking a `sources` list each get both an all-sources
+                                   run and one run per individual other batch as the sole source
+    run_lung_atlas_comparison.ipynb   interactive, one-batch-at-a-time version
+    aggregate_and_plot_paper.ipynb    arXiv Table 1 exactly (7 methods, pooled_concat = "Pooled")
+    aggregate_and_plot_new_pooled.ipynb   same, target_source_pooled = "Pooled" instead
+    aggregate_and_plot_stack_vs_pool.ipynb   all 8 methods together, both pooled variants shown
+                                              side by side as "Stack+Pool" / "Pool+Stack"
+    single_source_sensitivity.ipynb   target-only vs. multi_source_pooled with all sources vs.
+                                       each individual source, one at a time
 
 External_Methods/GDEC/           vendored comparator implementation used by method_gdec.py
 External_Methods/scRNA/          vendored comparator implementation used by method_scrna.py
@@ -72,8 +97,8 @@ The `scrna` and `gdec_gcnfree` comparator methods in
 dependencies under `External_Methods/` — notably `torch`, `dgl`,
 `tensorboardX`, `click`, `cytoolz` for GDEC. These are only needed if you
 run those two specific comparator methods; the core package and the
-`target_only` / `multi_source_pooled` / `pooled_concat` / `adaptive_multi_source`
-/ `tlgmm` methods don't need them.
+`target_only` / `multi_source_pooled` / `pooled_concat` / `target_source_pooled`
+/ `adaptive_multi_source` / `tlgmm` methods don't need them.
 
 No pinned `environment.yml`/`requirements.txt` is included in this release;
 install the packages above with `pip`/`conda` as needed for the parts you
@@ -122,18 +147,25 @@ lung_atlas_analysis/data/lung_atlas_hvg_lognorm.h5ad
 ```
 
 relative to the repository root (a sibling of `Final_Lung_Atlas_Analysis/`),
-with `obs["batch"]` giving the 4 patient batches and `obs["cell_type"]`
-the 13 fine-grained cell-type labels used as ground truth. Then either run
-the notebook `Final_Lung_Atlas_Analysis/run_lung_atlas_comparison.ipynb`
-directly, or submit the Slurm-array version:
+with `obs["batch"]` giving the 4 patient batches (`obs["patient"]` gives
+the corresponding GEO sample IDs -- `Dropseq_1..4` = `ASK428, ASK440,
+ASK452, ASK454`) and `obs["cell_type"]` the 13 fine-grained cell-type
+labels used as ground truth. Then either run the notebook
+`Final_Lung_Atlas_Analysis/run_lung_atlas_comparison.ipynb` directly, or
+submit the Slurm-array version:
 
 ```bash
 cd Final_Lung_Atlas_Analysis
 sbatch run_lung_atlas_comparison.sh   # edit paths/resources for your cluster first
 ```
 
-and aggregate the resulting `results*/raw/*.csv` files with
-`aggregate_and_plot.ipynb` to reproduce Table 1.
+then aggregate the resulting `results_0.5_alpha/raw/*.csv` files with
+whichever notebook matches what you want to see:
+`aggregate_and_plot_paper.ipynb` to reproduce Table 1 exactly,
+`aggregate_and_plot_new_pooled.ipynb` for the same comparison with the
+newer pooled estimator, `aggregate_and_plot_stack_vs_pool.ipynb` to compare
+both pooled variants directly, or `single_source_sensitivity.ipynb` for the
+one-source-at-a-time breakdown.
 
 ## Attribution
 

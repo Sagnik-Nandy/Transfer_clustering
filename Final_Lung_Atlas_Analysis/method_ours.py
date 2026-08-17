@@ -1,4 +1,4 @@
-"""Our four methods, all already implemented in the transfer_clustering
+"""Our five methods, all already implemented in the transfer_clustering
 package (Python_Scripts/transfer_clustering/multi_cluster.py) -- this file
 is just thin wrappers giving each one the uniform (X_T, sources, seed) ->
 labels signature the other method scripts share, for a uniform driver in
@@ -13,7 +13,15 @@ the notebook.
                              matrix, clustered directly with relaxed
                              K-means, keeping only the target rows'
                              labels
-  4. adaptive_multi_source -- bootstrap-adaptive target/source switch
+  4. target_source_pooled -- target+source pooled-subspace estimator
+                             (`target_source_pooled_subspace_estimate`):
+                             like multi_source_pooled, but the target's own
+                             estimated mean matrix is pooled into the
+                             projection subspace alongside the sources',
+                             instead of being reserved for a separate
+                             target-only branch. Not part of the discussion
+                             draft; a user-specified extension.
+  5. adaptive_multi_source -- bootstrap-adaptive target/source switch
 
 NOTE on cost: pooled_concat feeds RelaxedKMeans an SDP over ~9,900
 concatenated rows (vs. ~3,183 for target_only alone), and the SDP's cubic
@@ -37,6 +45,7 @@ from transfer_clustering.multi_cluster import (
     onehot_to_labels,
     _target_branch,
     pooled_subspace_estimate,
+    target_source_pooled_subspace_estimate,
 )
 
 from common import K, center_data
@@ -84,6 +93,15 @@ def method_pooled_concat(X_T: np.ndarray, sources: list, seed: int) -> np.ndarra
     return onehot_to_labels(Z)
 
 
+def method_target_source_pooled(X_T: np.ndarray, sources: list, seed: int) -> np.ndarray:
+    sources_c = [center_data(X_S) for X_S in sources]
+    Z = target_source_pooled_subspace_estimate(
+        center_data(X_T), K, sources_c,
+        relaxed_kmeans_kwargs=RELAXED_KMEANS_KWARGS, random_state=seed,
+    )
+    return onehot_to_labels(Z)
+
+
 def method_adaptive_multi_source(X_T: np.ndarray, sources: list, seed: int) -> np.ndarray:
     sources_c = [center_data(X_S) for X_S in sources]
     model = AdaptiveProjectedClustering(
@@ -99,5 +117,6 @@ OURS_METHODS = {
     "target_only": method_target_only,
     "multi_source_pooled": method_multi_source_pooled,
     "pooled_concat": method_pooled_concat,
+    "target_source_pooled": method_target_source_pooled,
     "adaptive_multi_source": method_adaptive_multi_source,
 }
