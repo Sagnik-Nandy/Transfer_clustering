@@ -22,6 +22,11 @@ __pycache__/
 /Results_simulation/
 Final_Lung_Atlas_Analysis/results/
 Final_Lung_Atlas_Analysis/results_0.5_alpha/
+Final_Lung_Atlas_Analysis_PCA100/results_0.5_alpha/
+Lung_Analysis_Sweep/results/
+Lung_Analysis_Sweep/cache/
+Final_Mouse_PBMC_Analysis/results/
+Final_Mouse_PBMC_Analysis/data/
 
 # Timestamped backups of results dirs, taken before a clear-and-resubmit
 # (e.g. results_0.5_alpha_pre_expansion_backup_2026-08-17/) -- never meant
@@ -43,6 +48,11 @@ Final_Lung_Atlas_Analysis/results_0.5_alpha/
 /Metabolomics_Data/
 /lung_atlas_analysis/
 /intro_illustration/
+
+# External raw data bundle (MoDaH paper's Zenodo archive, ~2.9GB, not ours
+# to redistribute) -- Final_Mouse_PBMC_Analysis/preprocess.py reads from it
+# locally but the repo doesn't ship it.
+/MoDaH_Data/
 
 # Reference/personal PDFs and notes kept local-only
 *.pdf
