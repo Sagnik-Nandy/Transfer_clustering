@@ -1,0 +1,28 @@
+# Core numerical stack (transfer_clustering/, Numerical_Experiments/,
+# Mouse_PBMC_Experiments/Final_Mouse_PBMC_Analysis/)
+numpy==2.3.3
+scipy==1.16.2
+scikit-learn==1.7.2
+pandas==2.3.2
+matplotlib==3.10.6
+
+# Single-cell data loading/preprocessing (Mouse_PBMC_Experiments/)
+scanpy==1.12.2
+
+# Notebooks
+jupyter
+ipython==9.5.0
+
+# Optional: only needed if transfer_clustering.RelaxedKMeans is configured
+# with a cvxpy solver name (e.g. solver="SCS") instead of the default
+# "ADMM" solver, which needs no external SDP solver. Imported inside a
+# try/except, so its absence does not break anything else.
+cvxpy==1.9.2
+
+# Not pinned here (separate environments -- see the root README's
+# Requirements section for details):
+#   - External_Methods/GDEC's comparator (method_gdec.py): torch, tqdm, cytoolz
+#   - External_Methods/scRNA's comparator (method_scrna.py): cvxopt, numba,
+#     plus the rest of External_Methods/scRNA/requirements.txt
+#   - Mouse_PBMC_Experiments/mouse_intro_illustration/'s R plotting script:
+#     ggplot2, dplyr, patchwork, latex2exp

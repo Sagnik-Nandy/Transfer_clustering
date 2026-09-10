@@ -7,7 +7,9 @@ blood subset, 6 `PeripheralBlood_<i>` batches). Every batch is used as
 target in turn, for two binary (K=2) contrasts (B cell vs Macrophage,
 T cell vs NK cell -- the only two cell-type pairs present in every batch
 with non-trivial counts), recording both ARI and misclustering loss over
-an 8-point log-spaced target-sample-size grid (`K_MIN=10`).
+an 8-point log-spaced target-sample-size grid (`K_MIN=10`). See the root
+README for install requirements (Python for the sweep, R for
+`plot_intro_figure.R`).
 
 Estimator: oracle branches only (`transfer_clustering.two_community`'s
 `target_based_estimate` / `source_based_estimate`), no adaptive/bootstrap
