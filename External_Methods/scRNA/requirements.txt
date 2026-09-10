@@ -1,0 +1,8 @@
+scipy
+numpy=1.16.2
+numba
+nose
+matplotlib
+cvxopt
+scikit-learn
+pandas
