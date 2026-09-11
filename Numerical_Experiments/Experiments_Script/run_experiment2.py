@@ -71,11 +71,7 @@ UV_SEED = 20260711
 
 # AdaptiveTransferClustering knobs. Experiment 2's grid has 5*5=25 cells per
 # regime, and each adaptive call's cost scales with ADAPTIVE_N_BOOT (each
-# bootstrap replicate re-runs the spectral estimator) -- lowered from
-# Experiment 1's 50 to keep the grid tractable, especially for regime R3
-# (n_T=2500, the slow one).
-# Test wall-clock time on the cluster with a small --array range before
-# committing to the full N_SEEDS * len(REGIMES) sweep.
+# bootstrap replicate re-runs the spectral estimator).
 ADAPTIVE_N_BOOT = 20
 ADAPTIVE_ALPHA = 0.5
 ADAPTIVE_BOUNDARY_SCALE = 1.0
