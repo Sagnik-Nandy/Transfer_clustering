@@ -20,9 +20,7 @@ behavior directly, rather than as a side effect of a broader comparison.
 It is structurally `run_experiment1.py` (same REGIMES, MU_GRID, theta
 construction) with two differences:
 
-  1. Only 3 methods: target, source, pooled. No adaptive (this experiment
-     isolates pooled's own behavior, not a comparison against the
-     validation-statistic switch).
+  1. Only 3 methods: target, source, pooled. 
   2. A second swept axis, `target_regime`, fixes Delta_T at one of two
      values instead of the single Delta_T=0.8 Experiment 1 uses, so the
      mu sweep is repeated once with the target below its own target-only
