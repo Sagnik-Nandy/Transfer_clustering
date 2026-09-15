@@ -10,21 +10,6 @@ three of Experiment 1's aspect-ratio regimes (R1, R2, R3).
         Algorithm 1 collapsed to a single source task (no fusion needed
         with only one task).
 
-A third comparator, Transfer Spectral Clustering (Jiang & Chung), was
-deliberately dropped: its co-clustering term reuses the raw data matrix
-directly as a bipartite graph's edge weights (rather than deriving any
-actual similarity measure), which is only a valid affinity for data whose
-raw magnitude already means "connection strength" (e.g. word counts --
-matching the paper's own text-clustering experiments). A continuous
-Gaussian feature value has no such reading, and the construction relies
-on the resulting graph Laplacian's row/column degree sums being
-non-negative (for D1^(-1/2), D2^(-1/2) to even be real, and for the
-Laplacian to be positive semi-definite, which is what gives the
-trace-maximization objective its "smooth embedding" meaning in the first
-place). Neither holds for signed Gaussian data -- this is a fundamental
-mismatch with our simulation setting, not a fixable implementation detail,
-so it is excluded from this comparison rather than reported unfairly.
-
 Usage (matches Slurm_Scripts/experiment4_comparators/run_experiment4.sh):
 
     python run_experiment4.py <regime> <seed>
@@ -70,8 +55,7 @@ implement the fixed-kappa0 half of that (TLGMM_KAPPA0 = 1/3, matching
 their convention); TLGMM_C_LAMBDA0 is fixed directly on the paper's own
 scale (1.7, between their reported "small C_lambda" grid points 1.29 and
 2.15, Figure S.19) rather than cross-validated -- a simplification on our
-part for this comparator,
-not a limitation of the published method.
+part for this comparator, not a limitation of the published method.
 """
 from __future__ import annotations
 
