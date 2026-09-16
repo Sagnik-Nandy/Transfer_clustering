@@ -34,7 +34,8 @@ construction) with two differences:
          every regime (2.0 vs 1.778 for R1/R2, vs 1.0 for R3), while
          still below Delta_S=3.0 (same DELTA_S_BY_REGIME as Experiment
          1), i.e. target SNR is recoverable on its own but still weaker
-         than source SNR. The figure for above BBP not reported in paper and did not show any significant difference.
+         than source SNR. The figure for above BBP not reported in paper
+         and did not show any significant difference.
 
     Both values are threaded through the *same* (u, v) draw per (regime,
     seed) -- only Delta_T's magnitude changes, not theta_T's direction --
