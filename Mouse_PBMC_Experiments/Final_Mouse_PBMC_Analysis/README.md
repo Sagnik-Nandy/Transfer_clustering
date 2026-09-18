@@ -14,7 +14,9 @@ there under `External_Methods/`).
    `.h5ad` conversion (see the script's docstring for the exact filtering/
    normalization steps and data provenance). Point `SRC_PATH` at your own
    local copy of the raw PBMC subset first. Produces
-   `data/mouse_pbmc_hvg_lognorm.h5ad`.
+   `data/mouse_pbmc_hvg_lognorm.h5ad`. Alternatively, skip this step and
+   [download the preprocessed file directly](https://www.dropbox.com/scl/fi/lyd87h024usuk45tc406a/mouse_pbmc_hvg_lognorm.h5ad?rlkey=6spahvvu77644zi8tcl6v9x6p&st=7l3w5iuf&dl=1)
+   to `data/mouse_pbmc_hvg_lognorm.h5ad`.
 2. **`run_mouse_pbmc_comparison.py <task_id>`** -- one (target batch,
    method) combination per task (42 tasks total: 6 batches x 7 methods).
    Writes one CSV to `results/raw/<batch>__<method>.csv`. Submit at scale

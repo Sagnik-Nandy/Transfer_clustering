@@ -15,3 +15,16 @@ Both pipelines load the same preprocessed data,
 `Final_Mouse_PBMC_Analysis/data/mouse_pbmc_hvg_lognorm.h5ad` -- produced by
 `Final_Mouse_PBMC_Analysis/preprocess.py` -- so run that first regardless
 of which pipeline you're using.
+
+## Data
+
+The preprocessed `.h5ad` file is not checked into this repository. Download
+it directly and place it at
+`Final_Mouse_PBMC_Analysis/data/mouse_pbmc_hvg_lognorm.h5ad`:
+
+[Download `mouse_pbmc_hvg_lognorm.h5ad`](https://www.dropbox.com/scl/fi/lyd87h024usuk45tc406a/mouse_pbmc_hvg_lognorm.h5ad?rlkey=6spahvvu77644zi8tcl6v9x6p&st=7l3w5iuf&dl=1)
+
+Alternatively, regenerate it yourself by running
+`Final_Mouse_PBMC_Analysis/preprocess.py` against your own copy of the raw
+PBMC subset (see that script's docstring for provenance and the exact
+preprocessing steps).
